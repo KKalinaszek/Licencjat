@@ -129,104 +129,80 @@ dla promotora
 
 \thispagestyle{empty} \setcounter{page}{0} \tableofcontents
 
-\chapter*{Wstęp}
+\chapter*{Streszczenie: [200-400 słów]}
 
 \thispagestyle{empty} \addcontentsline{toc}{chapter}{Wstęp}
 
-Wstęp do pracy dyplomowej. Zwykle pisany na końcu i zawierający streszczenie i podsumowanie najważniejszych aspektów i celów pracy.
-\chapter{Pojęcia wstępne}
-\thispagestyle{empty}
+Zakres pracy obejmuje projekt oraz implementację aplikacji webowej – kalkulatora arytmetycznego dla dzieci. Podstawową funkcjonalnością dostarczaną przez aplikację jest wykonywanie prostych obliczeń arytmetycznych takich jak dodawanie i odejmowanie w zakresie dwudziestu, tak aby mogły z niego korzystać dzieci. Ponadto, kalkulator powinien prezentować proces obliczeń w sposób zrozumiały dla dzieci. Aplikacja ma być zgodna ze standardem HTML5, CSS oraz JavaScript.
 
+\chapter{Opis problemu}
+\thispagestyle{empty}
 \pagestyle{fancy}
 
+[obowiązkowo, dokładny opis, co program robi, do czego służy, jaki jest cel projektu np. proof of concept, prototyp, przetestowanie technologi]
 
+\section{Porównanie dostępnych rozwiązań}
 
+xxx
 
-\lipsum[1-2]
-\section{Definicje}
-\[
-\fal x\in X \quad \qquad \mbox{dla każdego }
-\]
-\begin{defi}
-Niech $x\in X$ będzie dowolnie ustalone.
-%punktory
-\begin{enumerate} %-- różne style punktorów i numeratorów
-\item punktor pierwszy
-\item punktor 2
-\item[{\rm (i)}] $x >y \Leftrightarrow x-y>0$
-\item[1$^o$] $x >y \Leftrightarrow x-y>0$
-\end{enumerate}
-\end{defi}
+\section{Możliwości zastosowania praktycznego}
 
-\section{twierdzenia}
-W pracy \cite{poz23} można znaleźć %----- cytowanie literatury
-\begin{twr}[Pitagoras]
-\label{t1}%etykieta twierdzenia
-Suma kwadratów przyprostokątnych w trójkącie prostokątnym jest równa kwadratowi przeciwprostokątnej tego trójkąta
-\end{twr}
-\begin{dowod}
-Niech $a$, $b$ i $c$ oznaczają .....
-\end{dowod}
-Odwołoanie do twierdzenia: Z twierdzenia \ref{t1} wynika
-\begin{prz}
-Niech $(X,d)$ będzie przestrzenią metryczną. ...
-\end{prz}
+xxx
 
-
-\lipsum
-\lipsum
-
-
-\chapter{tytuł rozdziału drugiego}
+\chapter{Projekt i analiza}
 \thispagestyle{empty}
 
-\lipsum[1-2]
+[obowiązkowo]
 
+\section{Aktorzy i Przypadki użycia}
 
+[obowiązkowo, jakie są podstawowe funkcjonalności]\\
+Wymagania funkcjonalne i niefunkcjonalne [obowiązkowo]
 
+\subsection{subsection}
+xxx
 
-\section{wzory wyróżnione nienumerowane}
-\subsection{Wzór klasyczny}
-Na dwa sposoby:
-\[
-\lim\limits_{n\to \infty}n=\sup \N=\{1,2,\ldots \}
-\]
-$$\lim\limits_{n\to \infty}n=\sup \N=\{1,2,\ldots \}$$
-\subsection{Wzór wieloliniowy z wyrównaniem}
-\begin{align*}
-f(x) &= x^2\\
-& {} + xy^3\\
-& = 0
-\end{align*}
-Szersze odstępy  %--- 5ex kontroluje szerokość, można dostosować
-\begin{align*} 
-f(x)=&\\[5ex]  
-&  jkhdhkdfhkjdsfhkjsfhksdhfskhgfkshfksgh\\[5ex]
-& {} + hsdkjhfgkjhgkjhfgkjhgfkj
-\end{align*}
-\section{wzory wyróżnione numerowane}
-Pojedyczny wzór numerowany:
-\begin{equation}
-\label{wz345}%etykieta wzoru
-x+y=y+x \qquad \mbox{ dla dowolnych }x,y\in X
-\end{equation}
-Wzory wieloliniowe z opcją numerowania tylko wybranych linii:
-\begin{align}
-\nonumber f(x) &= ax^2+bx\\
-\label{wz2} & {} + c\\
-\label{wz4} & = a(x-x_0)(x-x_1)
-\end{align}
-Wzór wieloliowy z globalnym numerem:
-\begin{equation}\label{wz3}
-\begin{array}{rcl}
-f(x)& =& ax+b\\[3ex]
-g(x)&=&\frac{ax+b}{cx+d}
-\end{array}
-\end{equation}
-Równość (\ref{wz345}) implikuje .....
+\section{Diagram klas}
 
+[obowiązkowo]
 
-\begin{thebibliography}{00}
+\section{Diagram modelu danych}
+
+[obowiązkowo, dla projektów korzystających z baz danych relacyjnych - ERD, dla pozostałych opis w jaki sposób dane będą zorganizowane, przechowywane, przykładowe dokumenty dla baz dokumentowych itp.]
+
+\section{Projekt interfejsu użytkownika}
+
+[mogą być makiety, szkice lub gotowe projekty grafik]
+
+\chapter{Implementacja}
+
+[obowiązkowo]
+
+\section{Architektura rozwiązania}
+
+obowiązkowo, diagramy uwzględniające architekturę całości, np. klient-serwer, jakie funkcjonalności na serwerze, a jakie po stronnie klienta, użyte wzorce projektowe np. MVC, RESTFul]
+
+\section{Użyte technologie}
+
+[obowiązkowo, jakie języki programowania, jakie dodatkowe biblioteki, np. na potrzeby mapowania obiektowo-relacyjnego, fraweworki webowe itp.]
+
+\chapter{Testy}
+
+[obowiązkowo w jaki sposób zamierzamy testować, czy automatycznie, czy manualnie i w jakim zakresie ]
+
+\section{Scenariusz testowania}
+
+[jak będziemy testować konkretne funkcjonalności]
+
+\section{Raport z testów}
+
+[tabelka pokazująca jak zaliczono/nie zaliczono scenariusze testowe]
+
+\chapter{Wkład własny}
+
+[obowiązkowo, ogólny podział prac w projekcie, czym konkretnie w projekcie student się zajmował w poszczególnych fazach/etapach projektu]
+
+\begin{thebibliography}{00} %Bibliografia [obowiązkowo, głównie dokumentacja techniczna, książki z inżynierii oprogramowania ale także artykuły z sieci, blogi, nawet wikipedia]
 \addcontentsline{toc}{chapter}{Literatura}
 
 %------------- Książka ---------------------
