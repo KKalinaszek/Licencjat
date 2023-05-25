@@ -3,10 +3,25 @@
 %----------------------- Wydruk jednostronny ---------------
 \documentclass[12pt,oneside,a4paper]{book} % jednostronnego
 
+%lista skrótów https://www.overleaf.com/learn/latex/Glossaries
+\usepackage[acronym]{glossaries}
+\makeglossaries
+\newacronym{qr}{QR}{Quick Response Code}
+\newacronym{mfi}{MFiI}{Wydział Matematyki, Fizyki i Informatyki}
+\newacronym{ug}{UG}{Uniwersytet Gdański}
+\newacronym{cddit}{CDDiT}{Centrum Doskonalenia Dydaktycznego i Tutoringu Uniwersytetu Gdańskiego}
+
+%usuwanie sierot i wdów
+\usepackage{titlesec}
+\widowpenalty=10000
+\clubpenalty=10000
+\usepackage[all]{nowidow}
+
+%podpis do własnych zdjęć
+\newcommand{\wlzdj}{\wlzdj}
 
 \usepackage{polski}
 \usepackage[utf8]{inputenc} %opcja dla edytorów kodujących polskie znaki w utf8
-%\usepackage[cp1250]{inputenc} %opcja dla edytorów kodujących polskie znaki w windows-1250
 \usepackage{lmodern}
 \usepackage{indentfirst}
 \usepackage{microtype}
@@ -14,9 +29,34 @@
 \usepackage{fancyhdr}
 \usepackage{pstricks,graphicx}
 \usepackage{amssymb}
-\def\bibname{Literatura}% zmienia nazwę Bibliografia na literatura
+\usepackage[
+backend=biber,
+style=numeric,
+sorting=ynt,
+language=polish % add this line to set the language to Polish
+]{biblatex}
+\DefineBibliographyStrings{polish}{%
+  bibliography = {Bibliografia}, % set the title of the bibliography to "Bibliografia"
+}
+\addbibresource{bibliografy.bib} % add your bibliography file here
+\usepackage{inconsolata}
 \usepackage{changepage}% zmieni pozycję marginesu
+\usepackage{float} % ---pozycjonowanie obrazu [H]---
+\usepackage{caption}
+\usepackage{subcaption}
 
+%linki
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
+
+\urlstyle{same}
 
 %---------------Zbiory liczbowe
 \newcommand{\R}{\mathbb{R}}
@@ -67,9 +107,11 @@
 \ #1}{}}
 
 \renewcommand{\sectionmark}[1]{\markright{\thesection.\ #1}}
+\usepackage{lipsum} 
+%------ Można usunąć przy pisaniu pracy
 
-
-\usepackage{lipsum} %------ Można usunąć przy pisaniu pracy
+%----------ścieżka dla dodawanych obrazów---------------
+\graphicspath{{images/}}
 %-----------------właściwa część pracy-----------------
 \begin{document}
 \thispagestyle{empty}
@@ -90,9 +132,8 @@ Karolina Pomian\\
 }
 }\par\vspace{0.5cm}\par
 {\large
-Kierunek: Informatyka Ogólnoakademicka\\
-Specjalność: \\
-Numery albumu: x, x, 275552\\
+Kierunek: Informatyka, profil ogólnoakademicki\\
+Numery albumu: 275545, 275526, 275552\\
 }
 \end{flushleft}
 \end{adjustwidth}
@@ -100,17 +141,17 @@ Numery albumu: x, x, 275552\\
 \vspace{1cm}
 
 \begin{center}{ \Large \textbf {
-Tytuł pracy
+Interaktywny przewodnik internetowy po wystawie\\
+``Historia Informatyki'' 
 }}
 \end{center}
 
-\vspace{3cm}
+\vspace{6cm}
 
 \begin{flushright}
-%praca dyplomowa\\
 Praca licencjacka napisana\\
-pod kierunkiem…………\\
-Hanna Furmańczyk
+pod kierunkiem\\
+dr Hanny Furmańczyk
 \end{flushright}
 \vfill
 \begin{center}{\large
@@ -121,74 +162,592 @@ Hanna Furmańczyk
 
 \vspace*{16cm}
 \begin{flushright}
-miejsce na ewentualne podziękowania\\
-dla promotora
+Serdeczne podziękowania składamy dr Hannie Furmańczyk, Annie Pawelczyk i Piotrowi Lewandowskiemu, bez których ta praca by nie powstała.
 \end{flushright}
-
-
-
-\thispagestyle{empty} \setcounter{page}{0} \tableofcontents
 
 \chapter*{Streszczenie: [200-400 słów]}
 
+\thispagestyle{empty} \addcontentsline{toc}{chapter}{Streszczenie}
+
+Zakres pracy obejmuje projekt oraz implementację aplikacji internetowej – interaktywnego przewodnika po wystawie historii informatyki na Wydziale Matematyki, Fizyki i Informatyki mieszczącego również Instytut Informatyki Uniwersytetu Gdańskiego. Podstawową funkcjonalnością dostarczaną przez aplikację jest dostęp do dodatkowych informacji na temat wystawy wraz z możliwością ich odsłuchania. W celu ułatwienia nawigacji między poszczególnymi tablicami użytkownik ma także możliwość zeskanowania kodu \acrshort{qr} przy danej tablicy, który od razu kieruje go na odpowiednią podstronę. Ponadto, przewodnik umożliwia przetestowanie zdobytej wiedzy w ramach quizu, a w przypadku wydarzeń organizowanych przez wydział zebrania punktów, za które gracze mogą otrzymać nagrody. Odpowiedzi do pytań można znaleźć na wystawie, przez co aplikacja zachęca zwiedzających do aktywnego się z nią zapoznawania. 
+
+
+
+\chapter*{Wstęp}
 \thispagestyle{empty} \addcontentsline{toc}{chapter}{Wstęp}
 
-Zakres pracy obejmuje projekt oraz implementację aplikacji webowej – kalkulatora arytmetycznego dla dzieci. Podstawową funkcjonalnością dostarczaną przez aplikację jest wykonywanie prostych obliczeń arytmetycznych takich jak dodawanie i odejmowanie w zakresie dwudziestu, tak aby mogły z niego korzystać dzieci. Ponadto, kalkulator powinien prezentować proces obliczeń w sposób zrozumiały dla dzieci. Aplikacja ma być zgodna ze standardem HTML5, CSS oraz JavaScript.
+Niniejsza praca bazuje na koncepcji przygotowanej na przedmiocie uczelnianym Projekt Zespołowy. W ramach tych zajęć studenci dobrani w zespoły mogli wybrać zadania do realizacji dla podmiotów wewnętrznych lub zewnętrznych oraz skorzystać z \emph{mentoringu}. Jednym z przedstawionych tematów było uatrakcyjnienie wystawy plansz znajdującej się w nowym budynku Wydziału \acrshort{mfi} poprzez rozwinięcie jej o interaktywną aplikację.
+
+\emph{Mentoring} polega na asystowanym zdobywaniu wiedzy i doświadczenia przez ucznia (ang. \emph{Mentee}). Wywodzi się ze środowiska biznesowego, gdzie pracownikowi wdrażającemu się na nowe stanowisko lub do nowego projektu przydziela się opiekuna. Opiekun ten służy swoją wiedzą (ang. \emph{know-how} oraz stanowi wsparcie dla \emph{Mentee} będąc niejako pośrednikiem między wdrażanym pracownikiem, a nową dla niego strukturą organizacji. Skraca to proces adaptacji i zmniejsza związany z nim stres.
+
+Zespołowi przydzielono mentorów - Annę Pawelczyk i Piotra Lewandowskiego - z firmy Dynatrace. Spotkania zespołu odbywały się co tydzień, a praca przebiegała w oparciu o metodykę Scrum. Zamiast codziennych spotkań, które są standardowe w tej metodyce, zespół zdecydował się na cotygodniowe raporty, w których omawiano postępy pracy oraz napotkane problemy. Każdy \emph{sprint} miał przewidzianą długość około miesiąca, co oznaczało, że ostatecznie odbyło się ich pięć. Wszystkie z nich zostały zakończone zgodnie z planem, spełniając w pełni swoje założenia.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=10 cm]{scrum.jpg}
+    \caption{Anna Pawelczyk (po lewej) i członkowie zespołu (po prawej) omawiający projekt w ramach cotygodniowego spotkania w siedzibie Dynatrace \wlzdj.}
+    \label{fig:mentoring}
+\end{figure}
+
+Na ostatnich zajęciach przedstawiono wynik pracy zespołu podczas prezentacji i \emph{live demo}. Możliwe było wyświetlanie tekstu, granie w \emph{quiz} i odsłuch nagrań automatycznie generowanych przez przeglądarkę.
+
+Następnie aplikacja była dalej rozwijana we własnym zakresie przez zespół. Poprawiono między innymi interfejs graficzny, zmieniono sposób odsłuchu tablic z bardziej podatnego na błędy i zakłócenia generatora tekstu online na nagrania przechowywane na serwerze i rozwinięto \emph{quizy} o ekran powitalny i końcowy oraz poprawiono przekazywanie informacji między podstronami, by trudniejsza była manipulacja wyniku.  Obecnie jest ona w pełni działająca i została już wielokrotnie przetestowana. Cieszyła się dużym zainteresowaniem i skutecznie zachęciła zwiedzających do zapoznania się z wystawą. W niniejszym opracowaniu opisano proces jej rozwoju oraz efekt końcowy.
 
 \chapter{Opis problemu}
 \thispagestyle{empty}
 \pagestyle{fancy}
+[obowiązkowo, dokładny opis, co program robi, do czego służy, jaki jest cel projektu np. proof of concept, prototyp, przetestowanie technologii]
 
-[obowiązkowo, dokładny opis, co program robi, do czego służy, jaki jest cel projektu np. proof of concept, prototyp, przetestowanie technologi]
+Głównym wyzwaniem, przed którym stanął zespół było, niskie zainteresowanie wystawą, zwłaszcza w czasie wydarzeń organizowanych na uczelni. W celu zrozumienia podłoża problemu przeprowadzono obserwacje w czasie tychże wydarzeń organizowanych na wydziale oraz podczas dnia powszedniego, gdy w budynku odbywały się zajęcia.
 
-\section{Porównanie dostępnych rozwiązań}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=10 cm]{problem_1.jpg}
+    \caption{Zwiedzający przechodzący koło wystawy \wlzdj.}
+    \label{fig:problem}
+\end{figure}
 
-xxx
+ Tablice, szerzej opisane w następnym paragrafie, choć same w sobie stanowią imponujący zbiór ciekawie prezentowanej wiedzy, były pomijane przez większość zwiedzających, którzy traktowali korytarz I piętra głównie jako przestrzeń komunikacyjną lub zatrzymywali się na parterze budynku, gdzie zwykle znajdowały się stoiska reprezentacji poszczególnych kierunków i kół naukowych — mowa tutaj o dniach, kiedy odbywały się wydarzenia. Dodatkowo, w salach na I piętrze prowadzono w czasie dni otwartych pokazy i gry, które jeszcze bardziej odwracały uwagę gości.
 
-\section{Możliwości zastosowania praktycznego}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=10 cm]{stoiska.jpg}
+    \caption{Stoiska na parterze budynku \wlzdj.}
+    \label{fig:stoiska}
+\end{figure}
 
-xxx
+W dni powszednie natomiast, w budynku znajdowało się stosunkowo mało studentów ze względu na fakt, że zajęcia są tam prowadzone tylko dla jednego kierunku.
+
+Żeby jeszcze lepiej zrozumieć podłoże zachowania odwiedzających, przeprowadzono z nimi rozmowy w terenie.
+Podczas wywiadów podkreślali oni głównie, że nie mają ochoty lub czasu czytać. Przytłaczała ich duża koncentracja tekstu. Same tablice zlewały się ze ścianami. Dodatkowo na uczelniach często pojawiają się podobne plakaty, często przestarzałe lub przeznaczone wyłącznie dla studentów, np. dotyczące spraw organizacyjnych. Z tego względu większość przechodniów nie zwracała na nie uwagi. W końcu większość z nich odwiedzała wydział, by wziąć udział w konkursach i zebrać rozdawane zwykle pamiątki (długopisy, cukierki, torby itp.). Te działania kojarzone są ze stoiskiem i kontaktem z drugim człowiekiem, nie z tablicami.
+
+Podsumowując obserwacje, na problem niskiego zainteresowania wystawą miały wpływ:
+\begin{enumerate}
+    \item mała liczba studentów odwiedzających wydział w dniach powszednich,
+    \item zbyt duża ilość tekstu odstraszająca zwiedzających,
+    \item duża konkurencja bardziej interaktywnych atrakcji w czasie wydarzeń organizowanych na wydziale,
+    \item lokalizacja tablic na I piętrze zamiast na parterze,
+    \item brak dodatkowej motywacji do interakcji z tablicami w postaci nagród, jakie można zdobyć uczestnicząc w konkursach,
+    \item niska atrakcyjność medium (tablic),
+    \item niedopasowanie do oczekiwań typowego gościa (poszukiwanie nagród i interaktywnej rozrywki),
+    \item brak dodatkowych elementów przykuwających uwagę, jak np. stoisko z oprowadzającym.
+\end{enumerate}
+
+Dzięki takiemu rozbiciu głównego problemu na pomniejsze, zespół mógł lepiej zrozumieć jaką funkcję ma pełnić aplikacja i lepiej ustalić cel projektu z \emph{product owner}'em.
+
+\section{Cel projektu}
+
+Ze względu na charakter projektu, głównym jego celem było spełnienie wymagań \emph{product owner'a}. W tym przypadku był nim Wydział Matematyki, Fizyki i Informatyki oraz reprezentujący go bezpośredni zleceniodawca w osobie prowadzącej zajęcia z projektu zespołowego dr Hanny Furmańczyk. Pierwotnie były one dość ogólne i doprecyzowywano je w trakcie rozwoju aplikacji.
+
+Jak wspomniano wyżej, zespół został poproszony o stworzenie aplikacji, która zachęci odwiedzających do zapoznania się z wystawą. Dodatkowo, zasugerowano wykorzystanie \emph{beacon}'ów, tj. niedużych, bezprzewodowych nadajników przesyłających dane za pomocą technologii \emph{Bluetooth Low Energy (BLE)} oraz dodanie funkcjonalności odsłuchu tekstów znajdujących się na tablicach. Funkcjonalność taka jest standardem, jeśli chodzi o wystawy w muzealnictwie i pozwala na łatwiejsze przyswajanie wiedzy, która w formie tekstowej jest nieatrakcyjna dla zwiedzającego.
+
+Szerzej, wymagania funkcjonalne i niefunkcjonalne aplikacji opisano w rozdziale \ref{chap:Funkcjonalności}.
+
+\section{Wystawa ``Historia Informatyki''}
+Jak wspomniano wyżej, w nowej części budynku Wydziału została zawieszona seria 24 plansz opisujących rozwój maszyn do liczenia, maszyn do pisania, komputerów i informatyki od czasów nowożytnych aż po współczesne - zatytułowanych Historia Informatyki \cite{syslo_plansze}. Plakaty przygotował Prof. Maciej M. Sysło.
+
+\begin{figure}[!htb]
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{1A_large-1.jpg}
+        \label{fig:tablica_1}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{9B_large-1.jpg}
+        \label{fig:tablica_24}
+    \end{minipage}
+    \caption{Przykładowe plansze wystawy Historia Informatyki \cite{syslo_plansze}.}
+    \label{fig:tablice}
+\end{figure}
+
+Maciej Marek Sysło to polski matematyk i informatyk, profesor nauk matematycznych, nauczyciel akademicki. Ukończył studia matematyczne ze specjalnością w dziedzinie metod numerycznych na Uniwersytecie Wrocławskim w 1968 roku. Jest autorem ponad 150 publikacji naukowych z dziedziny matematyki, informatyki i dydaktyki, a także blisko 30 książek i podręczników. Specjalizuje się w teorii grafów, matematyce dyskretnej, algorytmice i optymalizacji.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=6 cm]{Maciej_M._Sysło.jpg}
+    \caption{Prof. Maciej Sysło z wykładem na konferencji ITICSE'15(ACM) w lipcu 2015 w Wilnie \cite{maciej_syslo}.}
+    \label{fig:maciej_syslo}
+\end{figure}
+
+Pracuje na Uniwersytecie Mikołaja Kopernika w Toruniu, gdzie jest kierownikiem Zakładu Metodyki Nauczania Informatyki i Technologii Informacyjnej. Posiada bogate doświadczenie w dziedzinie informatyki, m.in. pełnił funkcję dyrektora Instytutu Informatyki na Uniwersytecie Wrocławskim oraz był przedstawicielem Polski w TC3 działającym w ramach IFIP. Jest również członkiem wielu stowarzyszeń naukowych, takich jak PTM, AMS, ACM, IEEE, IFIP i SNTI.
+
+Oprócz pracy naukowej, Sysło zajmuje się historią komputerów (posiada kolekcję mechanicznych kalkulatorów i maszyn do pisania) oraz muzyką, m.in. Chopinem, Mozartem, Enigmą, Vangelisem, Oldfieldem i Jarre'em. Jego dewizami są: "robić lepiej to, co inni robią dobrze" oraz "łączą nas więzy ludzkie, nie maszyny" \cite{syslo_info, syslo_info_wiki}.
+
+\section{\emph{Beacon} i technologia \emph{Bluetooth Low Energy} (\emph{BLE})}
+
+Technologia \emph{Bluetooth Low Energy (BLE)} została opracowana przez firmę Nokia już w 2006 roku. W latach 2013-2014 wprowadzono pierwsze urządzenia \emph{beacon}, które wykorzystywały tę technologię, tj. niewielkie, niskonapięciowe urządzenia, które emitują sygnał radiowy umożliwiający określenie położenia użytkownika wewnątrz budynków.
+
+\emph{Beacony} znajdują zastosowanie w branży \emph{eventowej} i marketingowej, pozwalając na przekazywanie informacji i interakcję z użytkownikami na terenie konferencji, imprez, centrów handlowych oraz muzeów. Urządzenia te mogą służyć do tworzenia interaktywnych gier, \emph{scavenger hunt} oraz analizowania ruchu ludzi w celu optymalizacji przepływu ruchu i zwiększenia zysków.
+Można je również zastosować w branży turystycznej, umożliwiając zwiedzanie miast z wykorzystaniem aplikacji mobilnych i dostarczając informacji o najważniejszych atrakcjach turystycznych. 
+
+Informacje o użytkownikach, takie jak preferencje zakupowe, czy czas spędzony w konkretnych miejscach, mogą być wykorzystane do dostosowania oferty do potrzeb klientów. Urządzenia te wymagają od użytkowników wyrażenia zgody na udostępnienie swoich danych, co stanowi istotny aspekt w kontekście ochrony prywatności.
+
+\section{Grywalizacja w upowszechnianiu wiedzy}
+
+Grywalizacja, czyli wykorzystanie elementów gier i technik ich projektowania - w kontekście niezwiązanym z nimi - mające na celu motywowanie ludzi do podejmowania działań \cite{grywalizacja}, stała się popularnym narzędziem w upowszechnianiu wiedzy, pozwalając na przyciągnięcie uwagi użytkowników i angażowanie ich w proces zdobywania informacji. 
+
+Jednym z najczęściej wykorzystywanych narzędzi grywalizacji są quizy, które umożliwiają interaktywną i przyjemną formę sprawdzania wiedzy z danej dziedziny. Quizy mogą być wykorzystane w wielu kontekstach, od edukacyjnych zajęć szkolnych, po konferencje i imprezy firmowe. Przykładowo, popularną grą quizową jest "Kahoot!", która umożliwia tworzenie i rozgrywanie quizów w czasie rzeczywistym, angażując uczestników do aktywnego uczestnictwa w procesie zdobywania wiedzy.
+
+Kolejnym narzędziem wykorzystującym grywalizację w celu przekazywania wiedzy są interaktywne wystawy muzealne. Dzięki nim zwiedzający mają szansę aktywnie uczestniczyć w zwiedzaniu, a informacje o eksponatach są przekazywane w sposób ciekawy i przyswajalny. W połączeniu z aplikacją mobilną, interaktywne wystawy umożliwiają interakcję z użytkownikami oraz pozwalają na zbieranie informacji o preferencjach zwiedzających i dostosowanie oferty do ich potrzeb. Przykładem gry opartej na interaktywnych wystawach muzealnych jest "Huntzz", która umożliwia zwiedzanie muzeów poprzez odgadywanie zagadek i odkrywanie tajemnic związanych z eksponatami.
+
+Oprócz quizów i interaktywnych wystaw muzealnych, istnieją także inne rodzaje gier opartych na grywalizacji, które służą do przekazywania wiedzy. Przykładem są gry symulacyjne, takie jak "Minecraft: Education Edition", które umożliwiają naukę poprzez wirtualną interakcję z różnymi przedmiotami i zjawiskami. Innym przykładem są gry typu \emph{escape room}, takie jak "Breakout EDU", w których uczestnicy rozwiązują zagadki i łamigłówki, aby znaleźć wyjście z pomieszczenia, jednocześnie zdobywając wiedzę z różnych dziedzin.
+
+Podsumowując, grywalizacja jest skutecznym narzędziem w upowszechnianiu wiedzy, a quizy i interaktywne wystawy muzealne z aplikacją są jednymi z najpopularniejszych form wykorzystujących tę metodę. Ich wykorzystanie umożliwia przyciągnięcie uwagi użytkowników, angażowanie ich w proces zdobywania wiedzy oraz dostosowanie oferty do ich potrzeb i preferencji.
+
+\section{Podobne rozwiązania na terenie kampusu UG}
+
+Na terenie kampusu UG występują już podobne rozwiązania wykorzystujące grywalizację do przyciągania zwiedzających. Poniżej wymieniono kilka różnych przykładów. Każdy z nich może być dobrym wzorem do dalszego rozwoju projektu i stąd warto się z nimi zapoznać. 
+
+\subsection{Gra miejska na terenie kampusu "dokąd wiodą drogi nerwowe"}
+
+Powstała w ramach Dni Mózgu w Trójmieście gra miejska "dokąd wiodą drogi nerwowe" to połączenie aplikacji webowej oraz zewnętrznej, dostosowanej do tego rozwiązania natywnej aplikacji mobilnej "Actionbound".
+
+\begin{figure}[!htb]
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{dni_mozgu_qr_1.jpg}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{dni_mozgu_web.png}
+    \end{minipage}
+    \caption{Plakat reklamujący grę miejską na terenie kampusu "dokąd wiodą drogi nerwowe" z kodem QR oraz strona internetowa z opiniami o grze.}
+    \label{fig:dni_mozgu}
+\end{figure}
+
+Grę reklamuje plakat znajdujący się na terenie Wydziału Biologii. Zawiera on kod QR odsyłający do strony, gdzie można pobrać aplikację oraz przeczytać opinie graczy \footnote{Strona internetowa, gdzie można pobrać grę: \url{https://en.actionbound.com/bound/dnimozgu22}}.
+
+\subsection{Wystawy Wydziału Biologii UG}
+
+Na terenie kampusu UG Wydział Biologii wyróżnia się pod względem przyciągania zwiedzających. Na jego terenie znajdują się liczne wystawy, zarówno okresowe np. galerie fotografii zwierząt wykonanych przez studentów, jak i stałe, spośród których można wyróżnić kolekcję szkieletów ssaków, czy "życie w lesie bursztynowym".
+
+Ciekawe jest też akwarium z żywymi rybami, które można obserwować online \footnote{Strona internetowa, gdzie można obserwować ryby \url{https://biology.ug.edu.pl/wydzial/wystawy-na-wydziale-biologii/akwarium-malawi}}. 
+
+\begin{figure}[H]
+    \begin{minipage}{0.22\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{ryrby_kamera.jpg}
+    \end{minipage}\hfill
+    \begin{minipage}{0.76\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{ryby_qr.jpg}
+    \end{minipage}
+    
+    \caption{Przykład wystawy na terenie Wydziału Biologii "Mieszkańcy Akwarium Malawi", z widocznym kodem QR \wlzdj.}
+    \label{fig:wystawy_biologia}
+\end{figure}
+
+Wystawa ta wzbogacona jest przez natywną aplikację mobilną "Wystawy Wydziału Biologii UG".
+
+Główne jej funkcjonalności to:
+\begin{itemize}
+    \item znajdowanie informacji o eksponatach po kodach QR oraz numerach,
+    \item przystępna lista obecnie znajdujących się na wydziale wystaw i kolekcji wraz z dodatkowymi materiałami multimedialnymi,
+    \item dostęp do mapy wydziału z naniesionymi wystawami,
+    \item quizy dotyczące wystaw,
+    \item aktualności np. o nocy muzeum i konferencjach,
+    \item oraz linki do \emph{social media} wydziału i map Google z dojazdem.
+\end{itemize}
+
+Bardzo wartościowym pomysłem jest umieszczenie wielu odnośników do aplikacji, które można znaleźć nawet w windzie. Sprzyja to zauważeniu aplikacji przez zwiedzających, zwłaszcza duży plakat na przeciwko głównego wejścia.
+
+\begin{figure}[H]
+    \begin{minipage}{0.28\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{biodashboard.png}
+    \end{minipage}\hfill
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{winda_qr.jpg}
+    \end{minipage}\hfill
+    \begin{minipage}{0.38\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{bilogia_wejscie.jpg}
+    \end{minipage}
+    \caption{\emph{Dashboard} aplikacji Wystawy Wydziału Biologii UG oraz przykłady miejsc, w których można znaleźć informacje o aplikacji wystaw Wydziału Biologii, po lewej plakat w windzie, po prawej plakat na przeciwko głównego wejścia \wlzdj.}
+    \label{fig:wystawy_biologia_QR}
+\end{figure}
+
+Jak wspomniano wyżej, aplikacja jest natywna, tj. trzeba ją zainstalować na telefonie oraz udzielać zezwoleń na dostęp do niektórych jego funkcjonalności. Jest to dobre rozwiązanie dla tak rozbudowanego narzędzia, które może być wielokrotnie używane przez studentów. Mniej korzystnie przedstawia się sprawa w przypadku jednorazowych gości, którzy mogą być negatywnie nastawieni do instalacji dodatkowego oprogramowania.
+
+Aplikacja została przygotowana przez firmę QRTAG \footnote{Strona internetowa firmy QRTAG: \url{https://qrtag.pl/}}. Firma ta specjalizuje się w tworzeniu dedykowanych rozwiązań mobilnych.
+
+\subsection{\emph{Escape room} w Bibliotece Głównej}
+
+\section{Instrukcja uruchomienia}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=10cm]{uzytkowanie.jpg}
+    \caption{Skanowanie kodu QR za pomocą telefonu w celu użycia aplikacji \wlzdj.}
+    \label{fig:uzytkowanie_aplikacji}
+\end{figure}
 
 \chapter{Projekt i analiza}
-\thispagestyle{empty}
+\pagestyle{fancy}
+Projektowanie i analiza są kluczowymi procesami w dziedzinie planowania oraz opracowywania innowacyjnych i skutecznych rozwiązań. Projektowanie skupia się na tworzeniu i planowaniu pomysłów, które mają za zadanie osiągnięcie określonych celów. Analiza natomiast ma na celu badanie lub rozkładanie na części składowe projektów, aby lepiej zrozumieć ich strukturę lub właściwości.
 
-[obowiązkowo]
+W kontekście projektowania, analiza jest niezwykle ważna, ponieważ pozwala na dokładne zbadanie potencjalnych rozwiązań projektowych i wybór najlepszej opcji. Analiza może obejmować badanie wymagań projektowych, przeprowadzenie badań rynkowych, ocenę ryzyka, kosztów i korzyści, a także badanie wpływu projektu na środowisko. Dzięki analizie można wybrać najlepsze rozwiązania projektowe, które będą najlepiej odpowiadać potrzebom projektu.
 
-\section{Aktorzy i Przypadki użycia}
+Projektowanie i analiza są ze sobą ściśle powiązane i wzajemnie zależne. Projektowanie wymaga dokładnej analizy, abyśmy mogli dokładnie zrozumieć potrzeby projektu i wybrać najlepsze rozwiązanie. Z drugiej strony, analiza umożliwia nam wybór najlepszych opcji projektowych, które będą odpowiadać na potrzeby projektu\footnote{Strona internetowa wolski.pro : \url{https://wolski.pro/diagramy-uml/diagram-przypadkw-uzycia/}}.
 
-[obowiązkowo, jakie są podstawowe funkcjonalności]\\
-Wymagania funkcjonalne i niefunkcjonalne [obowiązkowo]
+\section{Aktorzy i przypadki użycia}
+Diagram przypadków użycia (ang. \emph{use case diagram}) jest diagramem, który przedstawia funkcjonalność systemu wraz z jego otoczeniem.
 
-\subsection{subsection}
-xxx
+Odgrywa on najważniejszą rolę w procesie projektowania systemu - opisuje wymagania funkcjonalne, jakim system musi sprostać, i otoczenie, w którym się znajduje. Diagram jest agregatem funkcji usług, które wykonuje system. Poza specyfikacją, diagram również pozwala na identyfikację funkcjonalności, weryfikację postępów w modelowaniu i implementacji, a także wspomaga komunikację pomiędzy uczestnikami projektu.
+
+Elementy diagramu przypadków użycia:
+\begin{itemize}
+    \item Aktorzy - Użytkownicy wchodzący w interakcję z systemem. Aktorami mogą być osoby, organizacje lub systemy zewnętrzne, które wchodzą w interakcję z aplikacją lub systemem. Muszą to być podmioty zewnętrzne, które wytwarzają lub konsumują dane.
+    \item System - Określona sekwencja działań i interakcji pomiędzy aktorami a systemem. Może być on również określany jako scenariusz.
+    \item Cele - Efekt końcowy większości przypadków użycia. Poprawnie wykonany diagram powinien opisywać czynności i warianty wykorzystane do osiągnięcia celu.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=12cm]{images/diagram_przypadek_uzycia.png}
+    \caption{Diagram UML przedstawiający aktora i przypadki użycia \wlzdj.}
+    \label{fig:diagram_przypadek_uzycia}
+\end{figure}
+
+\section{Wymagania funkcjonalne}
+
+Wymagania funkcjonalne (ang. \emph{Functional Requirements}) to konkretne działania lub zadania, które system lub produkt informatyczny musi wykonywać. Są one wyrażone w kontekście cech i funkcji systemu, a ich celem jest kierowanie procesem rozwoju. Standard IEEE Glossary of Software Engineering Terminology definiuje funkcjonalne wymagania jako "wymaganie, które określa funkcję, którą system lub komponent systemu musi być w stanie wykonać". Przewodnik SWEBOK opisuje funkcjonalne wymagania jako "cechy i możliwości systemu, które bezpośrednio odpowiadają na potrzeby użytkownika". Przewodnik Requirements Engineering zapewnia praktyczne podejście do identyfikacji, dokumentowania i zarządzania funkcjonalnymi wymaganiami. 
+\cite{wymagania_funkcjonalne, bourque1999guide, ian1997requirements}
+\\
+
+W przypadku aplikacji "Historia Informatyki" są to:
+\begin{itemize}
+    \item możliwość przeglądania tablic informacyjnych opisujących historię informatyki;
+    \item interaktywny quiz, który pozwoli użytkownikom na sprawdzenie swojej wiedzy z dziedzin matematyki oraz informatyki;
+    \item proste i intuicyjne interfejsy użytkownika umożliwiające łatwe poruszanie się po aplikacji;
+    \item szybka i niezawodna odpowiedź na żądania użytkowników, np. przejście na wybraną tablicę w celu znalezienia informacji;
+    \item obsługa różnych rodzajów urządzeń, na których użytkownicy będą korzystać z aplikacji, takich jak smartfony, tablety czy komputery.
+\end{itemize}
+
+\section{Wymagania niefunkcjonalne}
+
+Wymagania niefunkcjonalne (ang. \emph{Non-functional requirements}) odnoszą się do aspektów systemu lub produktu informatycznego, które nie są związane z jego konkretnymi funkcjami i cechami. Są one zazwyczaj wyrażone w kontekście wydajności, niezawodności, bezpieczeństwa, użyteczności i innych cech, które wpływają na ogólny komfort użytkownika. Standard IEEE Glossary of Software Engineering Terminology definiuje wymagania niefunkcjonalne jako "wymaganie, które określa kryteria, które można użyć do oceny działania systemu, a nie konkretnych zachowań". Przewodnik SWEBOK opisuje niefunkcjonalne wymagania jako "atrybuty jakości, które określają, jak dobrze system wykonuje swoje funkcje". Przewodnik Requirements Engineering zapewnia wskazówki dotyczące identyfikacji, dokumentowania i zarządzania niefunkcjonalnymi wymaganiami.
+\cite{bourque1999guide, ian1997requirements}
+\\
+
+Wymagania niefunkcjonalne dla aplikacji pt."Historia Informatyki" mogą być podzielone na trzy kategorie:
+\begin{itemize}
+    \item Ograniczenia
+    \begin{itemize}
+        \item System powinien być niezawodny i stabilny, aby zapewnić bezpieczną i nieprzerwaną pracę.
+        \item Aplikacja powinna działać na różnych urządzeniach i w różnych przeglądarkach internetowych.
+        \item System powinien być zgodny z normami bezpieczeństwa i prywatności, takimi jak RODO, oraz zasadami ochrony danych osobowych.
+    \end{itemize}
+    \item Założenia
+    \begin{itemize}
+        \item Zespół projektowy powinien mieć odpowiednie umiejętności i doświadczenie w tworzeniu aplikacji internetowych oraz znajomość aktualnych trendów w projektowaniu i programowaniu.
+        \item Wdrożony system powinien być łatwy w obsłudze dla użytkowników bez większych umiejętności informatycznych.
+        \item System powinien być łatwy do konserwacji i aktualizacji przez zespół techniczny.
+        \item System powinien być łatwy w modyfikacji i rozbudowie, aby w przyszłości można było dodać nowe funkcjonalności.
+    \end{itemize}
+    \item Cele biznesowe
+    \begin{itemize}
+        \item Aplikacja powinna przyczynić się do wzrostu prestiżu Instytutu Informatyki Uniwersytetu Gdańskiego.
+        \item System powinien usprawnić proces poznawania historii informatyki w Instytucie Informatyki Uniwersytetu Gdańskiego.
+        \item Aplikacja powinna przyczynić się do popularyzacji wiedzy o historii informatyki wśród studentów i innych odwiedzających instytut.
+    \end{itemize}
+\end{itemize}
 
 \section{Diagram klas}
+Diagram klas to graf, który przedstawia zbiór klas, interfejsów oraz kooperacji, wraz z relacjami między nimi. Jego celem jest opisanie statycznej struktury systemu, ukazanie zależności między klasami oraz stanowienie podstawy dla jego konstrukcji. W przypadku modelowania złożonych systemów, nie jest konieczne przedstawianie całej struktury na jednym diagramie, lecz należy pamiętać, że złożenie wszystkich diagramów tworzy kompletny model.
 
-[obowiązkowo]
+Diagramy klas są wybierane celowo, w oparciu o decyzje analityczne i projektowe, które uwzględniają wymagania funkcjonalne systemu oraz usługi, jakie powinien on udostępniać użytkownikom.
+
+Elementy diagramu klas zostały opisane poniżej.
+    \begin{itemize}
+        \item Klasa - to abstrakcyjny opis grupy obiektów, które posiadają takie same cechy, funkcjonalności, związki i znaczenie. Każdy obiekt w klasie ma identyczne atrybuty, operacje i metody, co pozwala na ich jednolite traktowanie. Ważnym założeniem jest niezmienność właściwości i zachowań obiektów przypisanych do klasy, co oznacza, że cechy i funkcjonalności obiektów w klasie są stałe. Stanowi ona wzorzec dla tworzonych obiektów, dlatego nie jest celowe, aby każdy z nich posiadał kopię tego samego opisu operacji; wszystkie utworzone obiekty powinny odwoływać się do wspólnej definicji operacji zawartych w klasie. Możemy zatem założyć, że klasa zawiera jedną uniwersalną definicję operacji, której używają wszystkie obiekty w klasie.
+        \item Atrybut - to właściwość klasyfikatora, która nadaje jej obiektom określone wartości. Atrybuty klas opisują charakterystyczne cechy i właściwości pojedynczych obiektów lub ich grup, tworząc dla każdego z nich oddzielną instancję. Jeśli atrybut klasy może istnieć niezależnie od obiektu, to zwykle lepszym rozwiązaniem jest utworzenie z niego nowej klasy, na przykład atrybutu Adres dla klasy Klient.
+        \item Operacja - to metoda, która jest dostępna dla danego obiektu i określa sposób, w jaki obiekt działa i reaguje na zadane wejście. Sygnatura operacji opisuje, jakie parametry są wymagane dla poprawnego działania operacji i w jaki sposób mogą być przekazywane. Używane są one do wykonywania działań na grupie obiektów, a zwykle istnieje tylko jedna instancja operacji klasy, która jest wspólna dla wszystkich obiektów tej klasy. W niektórych przypadkach, aby lepiej zdefiniować operację, można stworzyć nową klasę zamiast umieścić operację w klasie, której dotyczy.
+    \end{itemize}
 
 \section{Diagram modelu danych}
 
 [obowiązkowo, dla projektów korzystających z baz danych relacyjnych - ERD, dla pozostałych opis w jaki sposób dane będą zorganizowane, przechowywane, przykładowe dokumenty dla baz dokumentowych itp.]
 
 \section{Projekt interfejsu użytkownika}
+Wstępne wizje projektu zostały stworzone w aplikacji "Figma", która jest narzędziem do projektowania interfejsów użytkownika. Za jej pomocą można tworzyć prototypy interaktywne, które pozwalają na szybkie testowanie i poprawianie projektów. Możliwe było stworzenie różnych wersji aplikacji i dostosowanie jej do potrzeb użytkowników.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{figma.png}
+    \caption{Wstępny projekt aplikacji w figmie. \wlzdj}
+    \label{fig:projekty_w_figmie}
+\end{figure}
 
-[mogą być makiety, szkice lub gotowe projekty grafik]
+\subsection{Strona główna}
+
+Strona główna aplikacji pt."Historia Informatyki" zawiera powitanie użytkownika, historię powstania oraz wymienia osoby zaangażowane w proces tworzenia. Można również poznać cel aplikacji, który opowiada o możliwości interaktywnego poznawania historii informatyki w oparciu o tablice informacyjne położone w Instytucie Informatyki Uniwersytetu Gdańskiego.
+
+Istnieje wersja standardowa dla większych ekranów (np. komputery czy laptopy) oraz dla mniejszych ekranów (np. telefony komórkowe).
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{strona_glowna_wersja_komputerowa.png}
+    \caption{Strona główna - wersja na komputer. \wlzdj}
+    \label{fig:strona_glowna_komp}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=6cm]{strona_glowna_wersja_tel.jpg}
+    \caption{Strona główna - wersja na telefon. \wlzdj}
+    \label{fig:strona_glowna_tel}
+\end{figure}
+
+    
+
+\subsection{Logowanie i rejestracja}
+
+\subsection{Quizy}
+Quizy z aplikacji "Historia Informatyki" to ciekawy sposób na sprawdzenie swojej wiedzy z tej dziedziny. Pytania powstały na podstawie plansz (ponad 150 pytań; przypada pięć losowych pytań do rozwiązania w każdym quizie), które są zlokalizowane w Instytucie Informatyki Uniwersytetu Gdańskiego.
+
+%baza 150 pytań powstała na podstawie plansz zlokalizowanych itd;
+
+Rozwiązywanie quizów było wielokrotnie nagradzane podczas dni otwartych, co zachęcało do udziału w zabawie i zdobywania wiedzy. Każdy quiz składa się z pięciu pytań z trzema dostępnymi odpowiedziami. Czasami mogą występować więcej niż jedna dobra odpowiedź, co dodaje trudności. Istnieje również możliwość pominięcia nieznanego pytania.
+
+Ważną cechą quizów jest to, że nie występują punkty ujemne, co pozwala na swobodne podejście do odpowiedzi i unikanie stresu.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{quiz_wersja_komp.png}
+    \caption{Sekcja "Quiz" - wersja na komputer (przedstawiony początek strony). \wlzdj}
+    \label{fig:quiz_wersja_komp}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{quiz_wersja_komp2.png}
+    \includegraphics[width=\linewidth]{quiz_wersja_komp3.png}
+    \caption{Sekcja "Quiz" - wersja na komputer (przedstawione początkowe przyciski).}
+    \label{fig:quiz_wersja_komp_2_3}
+\end{figure}
+
+\begin{figure}[H]
+    \begin{minipage}{0.33\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{quiz_wersja_tel.jpg}
+    \end{minipage}\hfill
+    \begin{minipage}{0.33\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{quiz_wersja_tel2.jpg}
+    \end{minipage}\hfill
+    \begin{minipage}{0.33\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{quiz_wersja_tel3.jpg}
+    \end{minipage}
+    \caption{Sekcja "Quiz" - wersja na telefon (przedstawione początkowe przyciski). \wlzdj}
+    \label{fig:quiz_wersja_tel}
+\end{figure}
+
+\subsection{Tablice}
+W aplikacji "Historia Informatyki" znajdują się rozszerzone informacje dotyczące tablic, które można znaleźć w Instytucie Informatyki Uniwersytetu Gdańskiego. Aby uzyskać dostęp do konkretnych tablic, wystarczy wejść na stronę główną aplikacji lub zeskanować odpowiedni kod QR, który znajduje się na tablicy.
+
+Każda tablica zawiera szczegółowe dane na temat konkretnego tematu z historii informatyki. Informacje te są rozbudowane, a czasem nawet opatrzone grafikami i ilustracjami, co pozwala na lepsze zrozumienie prezentowanego zagadnienia.
+
+Jedną z ważnych cech aplikacji jest możliwość odsłuchania treści tablicy. Dzięki temu użytkownik może słuchać informacji bez potrzeby czytania tekstu, co jest szczególnie przydatne dla osób z dysleksją lub innymi trudnościami w czytaniu.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{tablice_wersja_komp.png}
+    \includegraphics[width=\linewidth]{tablice_wersja_komp2.png}
+    \caption{Sekcja "Tablice" - wersja na komputer (fragmenty tablicy: 1a). \wlzdj}
+    \label{fig:strona_glowna_2a}
+\end{figure}
+
+\begin{figure}[H]
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{tablice_wersja_tel.jpg}
+    \end{minipage}\hfill
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{tablice_wersja_tel2.jpg}
+    \end{minipage}
+    \caption{Sekcja "Tablice" - wersja na telefon (fragmenty tablicy: 1a). \wlzdj}
+    \label{fig:quiz_wersja_tel_1a}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{tablice_wersja_komp3.png}
+    \includegraphics[width=\linewidth]{tablice_wersja_komp4.png}
+    \caption{Sekcja "Tablice" - wersja na komputer (fragmenty tablicy: 12b). \wlzdj}
+    \label{fig:strona_glowna_12b}
+\end{figure}
+
+\begin{figure}[H]
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{tablice_wersja_tel3.jpg}
+    \end{minipage}\hfill
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{tablice_wersja_tel4.jpg}
+    \end{minipage}
+    \caption{Sekcja "Tablice" - wersja na telefon (fragmenty tablicy: 12b). \wlzdj}
+    \label{fig:quiz_wersja_tel_12b}
+\end{figure}
+
+
+
+\subsection{Panel administratora}
+
 
 \chapter{Implementacja}
 
-[obowiązkowo]
+%[obowiązkowo]
+Implementacja w szerokim ujęciu to materializacja określonej idei, urzeczywistnienie obranej strategii, a także sam proces poszukiwania środków, które umożliwiłyby osiągnięcie wyznaczonych celów \cite{implementacja}. W kontekście informatycznym, to proces przekształcania abstrakcyjnego opisu systemu lub programu na konkretny obiekt fizyczny, taki jak komputer lub działający program napisany w konkretnym języku programowania. Proces ten obejmuje wdrożenie, przystosowanie i realizację abstrakcyjnego opisu systemu lub programu, co umożliwia stworzenie efektywnych i funkcjonalnych aplikacji. Implementacja może obejmować także cały proces tworzenia oprogramowania, włącznie z projektowaniem, testowaniem i wdrażaniem. Przykłady implementacji w informatyce to wdrożenie systemu operacyjnego lub aplikacji internetowej. 
 
 \section{Architektura rozwiązania}
 
 obowiązkowo, diagramy uwzględniające architekturę całości, np. klient-serwer, jakie funkcjonalności na serwerze, a jakie po stronnie klienta, użyte wzorce projektowe np. MVC, RESTFul]
 
-\section{Użyte technologie}
+\section{Użyte technologie i narzędzia}
 
-[obowiązkowo, jakie języki programowania, jakie dodatkowe biblioteki, np. na potrzeby mapowania obiektowo-relacyjnego, fraweworki webowe itp.]
+%[obowiązkowo, jakie języki programowania, jakie dodatkowe biblioteki, np. na potrzeby mapowania obiektowo-relacyjnego, frameworki webowe itp.]
+
+Aplikacja, będąca przedmiotem pracy, została stworzona z wykorzystaniem \emph{frameworka} Angular — jednego z najbardziej popularnych \emph{frameworków front-endowych} służących do budowania interaktywnych stron internetowych. Do napisania kodu aplikacji wykorzystano język programowania TypeScript, który jest oparty na składni JavaScript, ale wprowadza bardziej rozbudowane mechanizmy typowania, co ułatwia pracę z większymi projektami. W trakcie tworzenia aplikacji wykorzystano również narzędzie Figma — program do projektowania graficznego, który pozwala na tworzenie prototypów interfejsów użytkownika, a także GitHub — platformę hostingową dla projektów programistycznych, służącą do kontroli wersji i zarządzania kodem źródłowym. Aplikacja została opublikowana na GitHub Pages — bezpłatnej platformie hostingowej dla statycznych stron internetowych. W ramach projektu wykorzystano także Django — \emph{framework back-endowy} napisany w języku Python, służący do budowy zaawansowanych aplikacji internetowych.
+
+\subsection{TypeScript}
+TypeScript to język programowania stworzony przez Microsoft, który jest nadzbiorem języka JavaScript, co oznacza, że wszystkie ważne funkcje i składnia języka JavaScript są w pełni obsługiwane przez TypeScript. Potencjalnie każdy program napisany w języku JavaScript jest poprawnym programem TypeScript. Język ten dodaje jednak do tego wiele nowych funkcjonalności, takich jak silne typowanie, obsługę klas i interfejsów, a także narzędzia do obsługi błędów podczas kompilacji. Dzięki tym zaletom TypeScript umożliwia bardziej wydajne i bezpieczniejsze programowanie, poprawiając skalowalność i łatwość utrzymania kodu \cite{definicja_typescript}. 
+
+\subsection{Angular}% react go brrrr
+Angular to framework stworzony przez Google, oparty na języku TypeScript. Opiera się on na komponentach i służy do tworzenia skalowalnych aplikacji internetowych. Angular oferuje wiele zaawansowanych funkcji, w tym \emph{routing}, zarządzanie formularzami, komunikację klient-serwer i wiele innych. Zaletą Angulara jest również jego złożona architektura, która ułatwia organizację i strukturyzację projektu, co przekłada się na większą skalowalność aplikacji \cite{definicja_angular}.
+\\ Framework ten oferuje wiele udogodnień podczas pracy. Poniżej zostaną omówione niektóre z nich.
+
+\begin{itemize}
+    \item Modularność
+    
+    Angular opiera się na modularnej strukturze, co pozwoliło na łatwe zarządzanie i skalowanie projektu. Moduły umożliwiły organizowanie kodu aplikacji w logiczne bloki, co ułatwiło jego utrzymanie i rozwijanie. Angular oferuje także wiele narzędzi do zarządzania zależnościami, takich jak npm czy też yarn, co pozwaliło na łatwe dodawanie i usuwanie zewnętrznych bibliotek.
+    
+    \item Wbudowane narzędzia
+    
+    Angular oferuje wiele wbudowanych narzędzi i bibliotek. Wśród tych narzędzi znajdują się między innymi Angular CLI, czyli \emph{Command Line Interface}, które pozwoliło na szybkie tworzenie nowych projektów i komponentów z gotowych szablonów oraz zarządzanie nimi. Kolejnym z narzędzi jakie oferuje \emph{framework} jest Angular Material, będący biblioteką gotowych komponentów, która umożliwiła przyspieszenie prac nad stylowaniem niektórych elementów strony.
+    
+    \item Wsparcie od Google
+    
+    Angular został stworzony i rozwijany przez Google, co oznacza, że jest to narzędzie o dużej renomie i zaufaniu w branży IT. Korzystanie z narzędzi i dokumentacji oferowanych przez Google pozwoliło na szybkie rozpoczęcie pracy z Angularem, a także na rozwijanie umiejętności programistycznych. W trakcie tworzenia aplikacji możliwość korzystania z licznych przykładów kodu, dokumentacji oraz forum społeczności Angulara, pozwoliła na znalezienie odpowiedzi na wiele pytań oraz rozwiązanie problemów.
+    
+\end{itemize}
+
+% \subsection{Django}
+
+\subsection{Figma}
+Jest to aplikacja służąca do prototypowania i tworzenia interfejsów użytkownika. Jest oparta na chmurze, co oznacza, że projekty są przechowywane i dostępne online, umożliwiając łatwą współpracę między członkami zespołu. 
+\\Figma oferuje wiele funkcji przydatnych w procesie projektowania aplikacji webowej. Poniżej wypisano najważniejsze z nich.
+\begin{itemize}
+    \item Praca zespołowa
+    
+    Figma zapewnia możliwość współpracy z innymi członkami zespołu. Umożliwiła udostępnienie projektu oraz zaproszenie innych do edycji i komentowania, tak aby każdy mógł śledzić zmiany w czasie rzeczywistym. Możliwa była również komunikacja między członkami zespołu poprzez funkcję komentarzy i możliwość oznaczania innych użytkowników.
+    \item Tworzenie interfejsów
+    
+    Projektowanie interfejsów użytkownika odbywa się w sposób intuicyjny i łatwy. Można tworzyć warstwy, grupy, ikony, przyciski i inne elementy interfejsu, a następnie dowolnie nimi manipulować. Narzędzie oferuje wiele opcji formatowania, takich jak kolory, czcionki, rozmiary itp., co pozwoliło dostosować wygląd aplikacji do naszych potrzeb.
+    
+    \item Prototypowanie
+    
+    Figma umożliwia tworzenie interaktywnych prototypów. Pozwala tworzyć interakcje między różnymi ekranami, definiować przejścia, animacje i zachowanie elementów interfejsu. Dzięki temu można było przetestować podstawowe działanie aplikacji jeszcze przed rozpoczęciem implementacji.
+    
+\end{itemize}
+
+\subsection{GitHub}
+GitHub to platforma internetowa oparta na systemie kontroli wersji Git, która umożliwia programistom współpracę nad projektami, zarządzanie kodem źródłowym i udostępnianie projektów.
+\\Platforma wspomaga wiele aspektów wspólnego tworzenia aplikacji. Poniżej przedstawiono kilka z nich.
+\begin{itemize}
+    \item Integracja pracy
+    
+    GitHub umożliwiał efektywną współpracę między członkami zespołu. Każdy programista mógł w łatwy sposób pobierać najnowszą wersję kodu, wprowadzać zmiany na swoim \emph{branchu}, a następnie proponować je do scalenia (ang. \emph{pull request}) z głównym repozytorium. Proces ten ułatwiał integrację pracy poszczególnych członków zespołu i minimalizował konflikty w kodzie.
+    
+    \item System kontroli wersji
+    
+    Wykorzystanie systemu kontroli wersji Git na platformie GitHub umożliwiło śledzenie zmian w kodzie źródłowym aplikacji. Każda wprowadzona modyfikacja była rejestrowana, co pozwalało na łatwe porównywanie i przywracanie poprzednich wersji kodu w razie potrzeby. To zapewniało bezpieczeństwo i kontrolę nad rozwojem aplikacji.
+    
+    \item Zarządzanie pracą nad projektem
+    
+    Zadania w GitHub, znane również jako \emph{issues}, są miejscem, w którym można zgłaszać, śledzić i dyskutować o problemach, pomysłach lub zadaniach dotyczących projektu. Każde zadanie zawiera tytuł, opis, komentarze, oraz przypisanie do odpowiednich osób, co pomagało w kategoryzacji i oznaczaniu priorytetów konkretnych członków zespołu.
+        
+        Tablica projektu była bardzo przydatnym narzędziem służącym do zarządzania i wizualizacji prac nad projektem. Dzięki utworzonym na tablicy kolumnom, między którymi można było przerzucać wcześniej utworzone zadania, można było stale monitorować postępy w pracach, co było kluczowe dla efektywnej pracy według metodyki scrum.
+    
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=10cm]{tablicaprojektow.png}
+    \caption{Użycie tablicy projektów w naszym repozytorium GitHub. \wlzdj}
+    \label{fig:tablica_projektow}
+\end{figure}
+
+\subsection{GitHub Pages}
+GitHub Pages to usługa oferowana przez platformę GitHub, która umożliwia hostowanie statycznych stron internetowych bez konieczności korzystania z zewnętrznego serwera. Jest to idealne rozwiązanie do publikowania stron internetowych powiązanych z projektami open source, dokumentacją, stronami osobistymi i wieloma innymi typami witryn.
+\\Oto kilka cech i funkcji GitHub Pages:
+
+\begin{itemize}
+    \item Prostota użycia
+    
+    Wykorzystanie GitHub Pages jest wyjątkowo proste i wygodne. Dzięki integracji z platformą GitHub, wystarczy skonfigurować repozytorium projektu jako repozytorium GitHub Pages. GitHub Pages samodzielnie generuje i udostępnia stronę internetową bez potrzeby konfigurowania dodatkowego serwera lub infrastruktury hostingowej.
+    
+    \item Integracja z Git
+    
+    GitHub Pages wykorzystuje system kontroli wersji Git, co oznacza, że wprowadzenie zmian w repozytorium przekładało się na szybkie wdrożenie tych zmian na stronie. Po zaakceptowaniu i przesłaniu zmian, GitHub Pages automatycznie aktualizował stronę internetową, eliminując potrzebę ręcznego procesu wdrażania. Dzięki temu każda nowa wersja kodu była natychmiast dostępna dla użytkowników odwiedzających stronę, zapewniając aktualne i zgodne z najnowszymi zmianami treści.
+    
+    \item Bezpłatny hosting
+    
+    GitHub Pages oferuje darmowy hosting dla stron statycznych. To znaczy, że nie trzeba martwić się o koszty infrastruktury hostingowej ani limit transferu danych.
+    
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=10 cm]{ghpages.png}
+    \caption{Panel zarządzania GitHub Pages naszego repozytorium. \wlzdj}
+    \label{fig:gh_pages_deploy}
+\end{figure}
+
+\section{Funkcjonalności}
+\label{chap:Funkcjonalności}
+
+Funkcjonalność aplikacji jest pojęciem bardzo często poruszanym w życiu codziennym developerów, ale nie jest ono często dokładnie definiowane, stąd dla różnych kręgów może mieć inne znaczenie. Widać to na przykład w tym, jak definiuje ją Narodowe Centrum Kultury w ramach kampanii społeczno-edukacyjnej „Ojczysty – dodaj do ulubionych”: "to, że coś jest funkcjonalne" i stwierdza nawet, że nie powinno się tego słowa używać w kontekście „nowych funkcjonalnościach smartfonów” \cite{funkcjonalnosc_nck}.
+
+Dużo bardziej zbliżoną idei tego opracowania funkcjonalność opisują Jakob Nielsen i Raluca Budi w książce Funkcjonalność aplikacji mobilnych. Nowoczesne standardy UX i UI. Oni również jednak nie podają jej dokładnej definicji, a raczej czym powinna się cechować. Według nich funkcjonalność to zdolność do realizacji celów użytkownika w efektywny, skuteczny i satysfakcjonujący sposób. Funkcjonalność pozwala te cele osiągnąć nie umniejszając wydajności, dostępności i łatwości użytkowania \cite{nielsen2013funkcjonalnosc}.
+
+Pod tym względem obie definicje zgadzają się ze sobą: funkcjonalność to zdolność do spełnienia oczekiwanych funkcji.
+
+\subsection{Lista funkcjonalności}
+Określiwszy co rozumiemy pod ogólnym pojęciem funkcjonalności należy zdefiniować jakie funkcjonalności, a co za tym idzie funkcje, ma spełniać opisywana aplikacja mobilna.\\\\
+Sprowadzają się one do następujących podpunktów:
+\begin{enumerate}
+    \item przeglądanie treści tablic,
+    \item odsłuchiwanie treści tablic,
+    \item rozwiązywanie quizów,
+    \item wyświetlanie ich wyniku.
+\end{enumerate}
+
+\subsection{Opis funkcjonalności}
+
+\paragraph{Przeglądanie treści tablic}
+przez użytkowników pozwala na dostęp do zdigitalizowanych treści tablic, które są częścią wystawy "Historia Informatyki". Mogą oni czytać teksty, które zostały umieszczone jako wcześniej sformatowane pliki tekstowe. W celu poprawnego przemieszczania się między kolejnymi tekstami został stworzony plik JSON, który zawiera kolejne numery tablic, dzięki czemu można przełączać się między nimi opierając się na indeksach w tablicy obiektów. Logika zaimplementowana w tym rozwiązaniu pozwala na przejście z ostatniej tablicy na pierwszą oraz odwrotnie.
+
+\paragraph{Odsłuchiwanie treści tablic} zapewnia użytkownikom udogodnienie w formie możliwości odsłuchania treści tablic, które zostały zamieszczone w formie nagrań sporządzonych za pomocą syntezatora mowy. Dopasowanie odtwarzania odpowiedniego nagrania do wyświetlanej strony również odbywa się przy pomocy wcześniej wspomnianego pliku w formacie JSON. Użytkownik ma możliwość odtworzenia, zatrzymania oraz zresetowania czytania danego tekstu. Warto nadmienić, że zmiana obecnie przeglądanej tablicy wiąże się z przerwaniem obecnie czytanego tekstu.
+
+\paragraph{Rozwiązywanie quizów} umożliwia użytkownikom wzięcie udziału w quizach związanymi z tablicami wystawy. Mogą wybrać spośród quizów dotyczących konkretnych tablic lub quizu obejmującego wszystkie tablice. Każdy quiz składa się z pięciu losowo wybranych pytań z puli, zawierającej pytania z dwiema lub większą liczbą możliwych odpowiedzi. Większość pytań wymaga podania jednej, poprawnej odpowiedzi. Po wybraniu opcji, która jest uważana za pobraną błędne warianty odpowiedzi podświetlają się na czerwono, a odpowiedź poprawna jest oznaczona kolorem zielonym. Za poprawną odpowiedź użytkownik nagradzany jest jednym punktem, a błędna odpowiedź lub jej brak nie przynosi punktów.
+
+\paragraph{Wyświetlanie wyniku quizu.}
+
+Po ukończeniu quizu użytkownik zostaje przekierowany na stronę z wynikiem, na której może sprawdzić, na ile pytań udało mu się poprawnie odpowiedzieć. Jeśli wszystkie odpowiedzi były prawidłowe, otrzymuje wygenerowane hasło, które jest kluczem do odebrania nagrody w trakcie uczestnictwa w dniach otwartych lub innych wydarzeniach, na których prezentowana jest aplikacja.
 
 \chapter{Testy}
+Tworzenie oprogramowania to wieloetapowy proces, w którym napisanie kodu stanowi jedynie początek. Kolejnym etapem jest testowanie, które ma kluczowe znaczenie dla zapewnienia wysokiej jakości aplikacji, stron internetowych i programów. W ramach testowania wyróżniamy różne rodzaje testów, a także poziomy testowania.
 
-[obowiązkowo w jaki sposób zamierzamy testować, czy automatycznie, czy manualnie i w jakim zakresie ]
+W kontekście testów oprogramowania możemy rozróżnić dwa podstawowe rodzaje: testy ręczne (manualne) oraz testy automatyczne.
+W przypadku testów manualnych, proces testowania jest realizowany przez wykwalifikowanego pracownika, zwanego testerem. Tester korzysta z własnej wiedzy, doświadczenia oraz specjalistycznych narzędzi, które umożliwiają mu skuteczne sprawdzanie wydajności i sprawności oprogramowania. Natomiast testy automatyczne są wykonywane przez maszynę, która wykonuje z góry przygotowane instrukcje i scenariusze testowe. Ten rodzaj testowania cechuje się zdecydowanie większą prędkością i często wykazuje się większą skutecznością niż testy manualne.
+
+Wybór odpowiedniego rodzaju testów zależy od wielu czynników i jest silnie indywidualny. Zatrudnienie profesjonalnego testera wiąże się z wyższymi kosztami, a także niesie ryzyko wystąpienia błędów ludzkich. Należy również spodziewać się, że testowanie manualne będzie czasochłonnej niż testowanie automatyczne. Z drugiej strony, testy automatyczne mogą być atrakcyjnym rozwiązaniem, jeśli dążymy do oszczędności czasu i pieniędzy. Warto jednak pamiętać, że skuteczność tego rodzaju testowania zależy w dużej mierze od osoby odpowiedzialnej za tworzenie skryptów testowych\footnote{Blog internetowy, opisujący powyższe zagadnienia: \url{https://infolet.pl/blog/rodzaje-testow-oprogramowania/}}.
+
+Podczas tworzenia aplikacji "Historia Informatyki" zespół zdecydował się na testy manualne. Dzięki sporej liczbie wydarzeń w Instytucie Informatyki na Uniwersytecie Gdańskim można było uzyskać znaczną liczbę chętnych do przeprowadzenia testów.
 
 \section{Scenariusz testowania}
 
@@ -200,53 +759,53 @@ obowiązkowo, diagramy uwzględniające architekturę całości, np. klient-serw
 
 \chapter{Wkład własny}
 
-[obowiązkowo, ogólny podział prac w projekcie, czym konkretnie w projekcie student się zajmował w poszczególnych fazach/etapach projektu]
+% [obowiązkowo, ogólny podział prac w projekcie, czym konkretnie w projekcie student się zajmował w poszczególnych fazach/etapach projektu]
 
-\begin{thebibliography}{00} %Bibliografia [obowiązkowo, głównie dokumentacja techniczna, książki z inżynierii oprogramowania ale także artykuły z sieci, blogi, nawet wikipedia]
-\addcontentsline{toc}{chapter}{Literatura}
+Prezentowana praca została oparta o aplikację, która powstała w ramach przedmiotu „Projekt Zespołowy” opracowaną wspólnie przez zespół trzyosobowy. Cały zespół działał w metodyce scrum a zadania były rozdzielone równomiernie pomiędzy jego członków.
 
-%------------- Książka ---------------------
-\bibitem{day}
-M.M. Day, \textit{Normed Linear Spaces}, Springer-Verlag, Berlin
--- Heidelberg -- New York, 1973.
+Skład zespołu i podział pracy:
+\begin{enumerate}
+    \item Aleksandra Panek:
+    \begin{itemize}
+        \item \emph{front-end} – wizualna strona aplikacji (strona główna oraz wyświetlanie tablic),
+        \item zarządzanie projektem (podział zadań i nadzór ich realizacji),
+        \item przygotowywanie nagrań i funkcjonalności z nimi związanych / wygenerowanie kodów QR.
+    \end{itemize}
+    \item Agnieszka Kamińska:
+    \begin{itemize}
+        \item \emph{front-end} – wizualna strona aplikacji (strona główna oraz quiz),
+        \item poprawianie kodu (\emph{clean code, debugging} programu),
+        \item przygotowywanie treści tablic / druk kodów QR.
+    \end{itemize}
+    \item Karolina Pomian:
+    \begin{itemize}
+        \item stworzenie i rozbudowa funkcjonalności quizu,
+        \item \emph{back-end} – rozszerzanie istniejących funkcjonalności aplikacji,
+        \item stworzenie konta administratora etc.,
+        \item podpięcie bazy danych Django.
+    \end{itemize}
+\end{enumerate}
 
-%------------- Artykuł ---------------------
-\bibitem{james} R.C. James, \textit{Orthogonality in normed linear linear spaces}, Duke Math. J., {\bf
-12} (1945), 291--301.
+\chapter*{Podsumowanie}
+\thispagestyle{empty} \addcontentsline{toc}{chapter}{Podsumowanie}
 
-\bibitem{k} M. Kuczma, \textit{An Introduction to the
-Theory of Functional Equations and Inequalities}, PWN -
-Uniwersytet Śląski, Warszawa - Kraków - Katowice, 1985.
+Do czasu zakończenia pisania niniejszej pracy aplikacja internetowa będące jej tematem została już wykorzystana wielokrotnie do promocji wystawy ``Historia Informatyki'' między innymi w czasie dni otwartych wydziału. Skorzystali z niej zarówno studenci, maturzyści jak i dzieci odwiedzające Uniwersytet w ramach zajęć szkolnych.
 
-%------------- Skrypty, notatki do wykładu ---------------------
-\bibitem{poz23}
-W. Pleśniak, \  \textit{Wykłady z teorii aproksymacji}, WUJ,
-Kraków 2000.
+\renewcommand{\acronymname}{Spis akronimów}
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Spis akronimów}
+\printglossary[type=\acronymtype]
 
-%------------- Strona internetowa ---------------------
-\bibitem{OEF}
-Numbers of edges of regular polygons constructible with ruler and compass (A003401), The on-line encyclopedia of integer sequences, https://oeis.org/A003401 
 
-\end{thebibliography}
+
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Spis rysunków}
+\listoffigures
+
+\cleardoublepage
+\printbibliography[heading=bibintoc]  %Bibliografia [obowiązkowo, głównie dokumentacja techniczna, książki z inżynierii oprogramowania ale także artykuły z sieci, blogi, nawet wikipedia]
+
 \newpage\thispagestyle{empty}
-Imię i Nazwisko \hfill Kraków, dnia wpisać date\par\vspace{1cm}\par
-\centerline{{\Large \bf O Ś W I A D C Z E N I E}}
-\par\vspace{1.4cm}\par
-Świadomy(a) odpowiedzialności oświadczam, że przedłożona praca pt.:
-\begin{center}
-{\sc Tu wpisać tytuł pracy}
-\end{center}
-została napisana przeze mnie samodzielnie.
-\par
-Jednocześnie oświadczam że w/w praca nie narusza praw autorskich w rozumieniu Ustawy z dnia 4 lutego 1994 r. o prawie autorskim i prawach pokrewnych (Dz.U. z 2006 nr 90, poz.
-631 z późn. zmianami) oraz dóbr osobistych chronionych prawem cywilnym.
-\par
-Przedłożona praca nie zawiera danych empirycznych ani też informacji, które uzyskałem(am) w sposób niedozwolony. Stwierdzam, iż przedstawiona praca w całości ani też w części nie była wcześniej podstawą żadnej innej urzędowej procedury związanej z~uzyskaniem dyplomu ani też nadania tytułów zawodowych.
-\par\vspace{1cm}\par
-\begin{flushright}
-....................................... \ \ \ \ \ \ \\
-{\scriptsize (podpis)\hspace{2.3cm}\ }
-\end{flushright}
 
 
 \end{document}
